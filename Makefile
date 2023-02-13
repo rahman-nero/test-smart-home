@@ -70,5 +70,5 @@ npm-install:
 build-production: npm-install
 	docker-compose exec -T frontend-npm npm run build prod
 
-npm-start:
-	docker-compose exec frontend-npm npm run start
+npm-serve:
+	docker-compose exec frontend-npm npm run serve

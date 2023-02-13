@@ -1,22 +1,39 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\SignUpController;
+use App\Http\Controllers\Api\Equipment\EquipmentController;
+use App\Http\Controllers\Api\Equipment\EquipmentTypeController;
+use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::prefix('v1')->group(function() {
+    Route::get('login', [LoginController::class, 'login']);
+    Route::post('register', [SignUpController::class, 'signup']);
+});
 
 Route::prefix('v1')
     ->middleware('auth:sanctum')->group(function () {
 
-        Route::get('/', fn () => 'hello');
+        // Getting user's data
+        Route::get('user', [UserController::class, 'user']);
+
+        // Getting equipments along with the opportunity to search
+        Route::get('/equipment', [EquipmentController::class, 'index']);
+
+        // Getting the concrete equipment
+        Route::get('/equipment/{id}',[EquipmentController::class, 'show']);
+
+        // Adding a new equipment
+        Route::post('/equipment', [EquipmentController::class, 'create']);
+
+        // Editing a equipment
+        Route::put('/equipment/{id}', [EquipmentController::class, 'edit']);
+
+        // Soft delete equipment
+        Route::delete('/equipment/{id}', [EquipmentController::class, 'delete']);
+
+        // Getting the list of equipment's type
+        Route::get('/equipment-type', [EquipmentTypeController::class, 'index']);
 
 });
