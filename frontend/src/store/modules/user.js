@@ -1,6 +1,6 @@
 import {getHeaderSnippet, getToken, setToken} from "@/utils/common";
 import $host from "@/api/config";
-import {register} from "@/services/user";
+import {getInfo, login, register} from "@/services/UserService";
 
 export const user = {
     state: {
@@ -18,80 +18,48 @@ export const user = {
     },
     actions: {
         async authorization({commit}) {
-            const token = getToken();
-
-            return await $host.get('/user', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            }).then(response => {
-                if (response.data.code === 200) {
-                    commit('setIsAuth', true);
-                    commit('setInfo', response.data.message);
-                }
-            }).catch(error => {
-                console.log(error);
-            })
+            return getInfo()
+                .then(response => {
+                    if (response.data.code === 200) {
+                        commit('setIsAuth', true);
+                        commit('setInfo', response.data.message);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                })
 
         },
         async login({commit, dispatch}, {email, password}) {
-            return new Promise((resolve, reject) => {
-                $host.get('/login', {
-                    params: {
-                        email,
-                        password,
-                    }
-                }).then(response => {
+            return login(email, password)
+                .then((response) => {
                     if (response.data.code === 200) {
                         setToken(response.data.message.token);
                         commit('setIsAuth', true);
                         dispatch('fillInfo');
                     }
-                    resolve(response);
-                }).catch(error => {
-                    reject(error);
-                });
-            })
-
-
+                })
         },
         async register({commit, dispatch}, {name, email, password, password_confirmation}) {
-            // return register(name, email, password, password_confirmation).then(() => {
-            //
-            // })
-
-            return new Promise((resolve, reject) => {
-                $host.post('/register', {
-                    name,
-                    email,
-                    password,
-                    password_confirmation,
-                }, {...getHeaderSnippet()}).then(response => {
+            return register(name, email, password, password_confirmation)
+                .then((response) => {
                     if (response.data.code === 200) {
                         setToken(response.data.message.token);
                         commit('setIsAuth', true);
                         dispatch('fillInfo');
                     }
-                    resolve(response);
-                }).catch(error => {
-                    reject(error);
                 })
-            });
-
         },
         fillInfo({commit}) {
-            const token = getToken();
+            getInfo()
+                .then(response => {
+                    if (response.data.code === 200) {
+                        commit('setInfo', response.data.message);
+                    }
 
-            $host.get('/user', {
-                ...getHeaderSnippet()
-            }).then(response => {
-                if (response.data.code === 200) {
-                    commit('setInfo', response.data.message);
-                }
-
-            }).catch(error => {
-                console.log(error);
-            })
+                })
+                .catch(error => {
+                    console.log(error);
+                })
         }
     }
 };

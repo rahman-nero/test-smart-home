@@ -1,22 +1,20 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="colm-form">
-        <div class="form-container">
-          <Error v-bind:show="error">{{ errorMessage }}</Error>
+  <div class="row">
+    <div class="colm-form">
+      <div class="form-container">
+        <!-- Error block -->
+        <Error v-bind:show="error">{{ errorMessage }}</Error>
 
-          <input type="text" v-model="form.name" placeholder="Name address" required>
-          <input type="text" v-model="form.email" placeholder="Email address" required>
-          <input type="password" v-model="form.password" placeholder="Password" required>
-          <input type="password" v-model="form.password_confirmation" placeholder="Password Confirmation" required>
+        <input type="text" v-model="form.email" placeholder="Email address">
+        <input type="password" v-model="form.password" placeholder="Password">
 
-          <button class="btn-login" style="cursor: pointer" @click="submit">Create Account</button>
-          <button class="btn-new" @click="$router.push('/login')" style="cursor: pointer">Log in account</button>
-        </div>
+        <button class="btn-login" style="cursor: pointer" @click="submit">Login</button>
+        <button class="btn-new" @click="$router.push('/register')" style="cursor: pointer">Create account</button>
+
       </div>
     </div>
-
   </div>
+
 
 </template>
 
@@ -29,46 +27,37 @@ export default {
   data() {
     return {
       form: {
-        name: '',
         email: '',
-        password: '',
-        password_confirmation: ''
+        password: ''
       },
       error: false,
       errorMessage: '',
     };
   },
   methods: {
-    ...mapActions(['register']),
+    ...mapActions(['login']),
     submit() {
       this.error = false;
       this.errorMessage = '';
 
-      const name = this.form.name;
       const email = this.form.email;
       const password = this.form.password;
-      const password_confirmation = this.form.password_confirmation;
 
-      if (name === '' || email === '' || password === '') {
+      if (email === '' || password === '') {
         this.error = true;
         this.errorMessage = 'Вы должны заполнить поля';
         return;
       }
 
-      if (password !== password_confirmation) {
-        this.error = true;
-        this.errorMessage = 'Пароли не совпадают';
-        return;
-      }
-
-      this.register({name, email, password, password_confirmation})
-          .then(() => {
+      this.login({email, password})
+          .then(response => {
             this.$router.push('/');
           })
-          .catch((error) => {
+          .catch(error => {
             this.error = true;
             this.errorMessage = error.response.data.message;
           });
+
     }
   }
 }

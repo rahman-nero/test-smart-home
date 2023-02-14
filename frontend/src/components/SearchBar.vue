@@ -7,13 +7,12 @@
             {{ item.id }} - {{ item.serial_number }}
           </div>
         </div>
-      </div>
 
+      </div>
 </template>
 
 <script>
-import {getHeaderSnippet} from "@/utils/common";
-import $host from "@/api/config";
+import {search} from "@/services/EquipmentService";
 
 export default {
   data() {
@@ -25,20 +24,13 @@ export default {
   methods: {
     async loadResult() {
       try {
-        const response = await $host.get('/equipment', {
-          params: {
-            query: this.query
-          },
-          ...getHeaderSnippet()
-        });
-
+        const response = await search(this.query);
         this.data = [...response.data.message];
       } catch(error) {
         console.log('SearchBar', error);
       }
 
     },
-
     redirect(item) {
       this.query = '';
       this.data = [];
@@ -48,10 +40,12 @@ export default {
   },
   watch: {
     query(query) {
+      // Если у нас не пустой инпут, то тогда делаем запрос на получение данных
       if (query !== '') {
         this.loadResult();
       }
 
+      // Если пустой, то очищаем
       if (query === '') {
         this.data = [];
       }

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from "@/pages/Login.vue";
-import SignUp from "@/pages/SignUp.vue";
+import Login from "@/pages/Auth/Login.vue";
+import SignUp from "@/pages/Auth/SignUp.vue";
 import store from "@/store";
 import Main from "@/pages/Main.vue";
 import {getToken} from "@/utils/common";
@@ -25,7 +25,6 @@ const router = createRouter({
 const token = getToken();
 
 router.beforeEach(async(to, from) => {
-
   if (token !== null) {
     await store.dispatch('authorization');
   }

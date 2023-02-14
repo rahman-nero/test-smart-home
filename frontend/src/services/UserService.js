@@ -10,6 +10,12 @@ export const login = (email, password) => {
     })
 }
 
+export const getInfo = () => {
+    return $host.get('/user', {
+        ...getHeaderSnippet()
+    });
+}
+
 export const register = (name, email, password, password_confirmation) => {
     return $host.post('/register', {
         name,

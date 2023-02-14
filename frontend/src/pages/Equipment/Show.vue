@@ -2,7 +2,6 @@
   <Menu></Menu>
   <!-- Form -->
   <div class="container" v-if="!isLoading && !error">
-
     <h2>Оборудование - {{ data.serial_number }}</h2>
 
     <div class="form-container">
@@ -24,8 +23,12 @@
         </div>
 
 
-        <button type="button" class="btn btn-primary" style="margin-right: 7px"
-                @click="$router.push(`/edit/${$route.params.id}`)">Редактировать
+        <button type="button"
+                class="btn btn-primary"
+                style="margin-right: 7px"
+                @click="$router.push(`/edit/${$route.params.id}`)"
+        >
+          Редактировать
         </button>
         <button type="button" class="btn btn-danger" @click="remove">Удалить</button>
       </form>
@@ -48,6 +51,7 @@ import $host from "@/api/config";
 import {getHeaderSnippet} from "@/utils/common";
 import Error from "@/components/UI/Error.vue";
 import {mapActions} from "vuex";
+import {deleteItem, show} from "@/services/EquipmentService";
 
 export default {
   components: {Error, Menu},
@@ -64,29 +68,28 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['deleteEquipment']),
     async loadContent(id) {
       try {
-        const response = await $host.get(`/equipment/${id}`, {...getHeaderSnippet()});
+        const response = await show(id);
+
         this.data.type = response.data.message.type;
         this.data.serial_number = response.data.message.serial_number;
         this.data.comment = response.data.message.comment;
+
       } catch (error) {
         this.error = true;
+        this.errorMessage = 'Ошибка';
 
         if (error.response.data.code === 404) {
           this.errorMessage = 'Такого оборудования нет. Пожалуйста проверьте id';
-        } else {
-          this.errorMessage = 'Ошибка';
         }
 
       } finally {
         this.isLoading = false;
       }
-
     },
     async remove() {
-      this.deleteEquipment(this.data.id)
+      deleteItem(this.$route.params.id)
           .then((response) => {
             this.$router.push('/');
           })

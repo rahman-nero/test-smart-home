@@ -22,8 +22,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .header {
   width: 100%;
   position: fixed;
@@ -54,7 +52,4 @@ export default {
 .menu-margin {
   height: 80px;
 }
-
-
-
 </style>

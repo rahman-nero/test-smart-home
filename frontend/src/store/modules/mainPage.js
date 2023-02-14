@@ -1,11 +1,12 @@
 import {getHeaderSnippet} from "@/utils/common";
 import $host from "@/api/config";
+import {loadWithPaginate} from "@/services/EquipmentService";
 
-export const equipments = {
+export const mainPage = {
     state: {
         equipments: [],
         page: 1,
-        limit: 3,
+        limit: 10,
         totalPages: 0,
         error: false,
         errorMessage: '',
@@ -34,16 +35,7 @@ export const equipments = {
     actions: {
         async loadData({commit, state}) {
             try {
-                const response = await $host.get('/equipment', {
-                    params: {
-                        page: state.page,
-                        limit: state.limit
-                    },
-                    ...getHeaderSnippet()
-                });
-
-                console.log(response)
-
+                const response = await loadWithPaginate(state.page, state.limit)
                 commit('setEquipments', response.data.message.data);
                 commit('setTotalPages', response.data.message.meta.totalPages);
             } catch (error) {
@@ -51,20 +43,11 @@ export const equipments = {
                 commit('setError', true);
                 commit('setErrorMessage', error.response);
             }
-
         },
         changePage({commit, state, dispatch}, pageNumber) {
             if (pageNumber <= state.totalPages) {
                 commit('setPage', pageNumber)
                 dispatch('loadData');
-            }
-
-        },
-        async deleteEquipment({commit}, id) {
-            try {
-                return await $host.delete(`/equipment/${id}`, {...getHeaderSnippet()});
-            } catch (error) {
-                return error;
             }
         }
     }

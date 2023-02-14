@@ -1,11 +1,11 @@
 import {createStore} from 'vuex'
 import {user} from "@/store/modules/user";
-import {equipments} from "@/store/modules/equipments";
+import {mainPage} from "@/store/modules/mainPage";
 
 export default createStore({
     modules: {
         user,
-        equipment: equipments
+        mainPage
     }
 })
 
