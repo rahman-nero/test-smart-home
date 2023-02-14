@@ -65,10 +65,10 @@ laravel-up:
 
 ######################## FRONTEND COMMANDS
 npm-install:
-	docker-compose exec -T npm npm install
+	docker-compose exec -T frontend-npm npm install
 
-build-production: npm-install
-	docker-compose exec -T frontend-npm npm run build prod
+build-production:
+	docker-compose exec -T frontend-npm npm run build
 
 npm-serve:
 	docker-compose exec frontend-npm npm run serve
