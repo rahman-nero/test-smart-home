@@ -24,17 +24,27 @@ final class EquipmentService
      */
     public function multipleCreate(array $equipments): bool|array
     {
-        $checkResult = $this->checkSerialNumber($equipments);
-
-        if (is_array($checkResult)) {
-            return $checkResult;
-        }
+        // Переменная предназначенная для хранение ошибок. Если какое-то оборудование не прошло проверку, то мы
+        // заполним этот массив
+        $errors = [];
 
         // Разделил на две циклы, чтобы не было такого, что из 10 оборудований, добавлено 5, а на 6-том ошибке
         // И вернув пользователю ошибку об этом, что на 6-том оборудований ошибка, он сможет скорректировать данные и отправить снова
         // и у него будет ошибок со словами "такой серийный номер в базе существует"
         // Так как мы не добавили первые 5, когда у нас регулярка проходила.
         foreach ($equipments as $equipment) {
+
+            $checkResult = $this->checkSerialNumber(
+                serialNumber: $equipment['serial_number'],
+                equipmentTypeId: $equipment['equipment_type_id']
+            );
+
+            // Если у нас false, значит данное оборудование проверку не прошло
+            if (!$checkResult) {
+                $errors[] = $equipment['serial_number'];
+                continue;
+            }
+
             Equipment::query()
                 ->create([
                     'equipment_type_id' => $equipment['equipment_type_id'],
@@ -43,32 +53,26 @@ final class EquipmentService
                 ]);
         }
 
-        return true;
+        return !empty($errors) ? $errors : true;
     }
 
     /**
      * Проверка серийного номера на соответствие шаблона
      * Проверка с помощью регулярных выражений
-     * @param $equipments
-     * @return array|bool
+     * @param string $serialNumber
+     * @param int $equipmentTypeId
+     * @return bool
      */
-    protected function checkSerialNumber($equipments): array|bool
+    protected function checkSerialNumber(string $serialNumber, int $equipmentTypeId): bool
     {
-        // Проверка правильности всех данных
-        foreach ($equipments as $equipment) {
-            // Получение шаблона серийного номера
-            $regex = EquipmentType::query()->find($equipment['equipment_type_id'])->mask;
+        // Получение шаблона серийного номера
+        $regex = EquipmentType::query()->find($equipmentTypeId)->mask;
 
-            // Генерация регулярного выражения на основе шаблона
-            $generatedRegex = $this->generateRegex($regex);
+        // Генерация регулярного выражения на основе шаблона
+        $generatedRegex = $this->generateRegex($regex);
 
-            // Наш не совпадает
-            if (!preg_match($generatedRegex, $equipment['serial_number'])) {
-                return $equipment;
-            }
-        }
-
-        return true;
+        // Наш не совпадает
+        return (bool)preg_match($generatedRegex, $serialNumber);
     }
 
 

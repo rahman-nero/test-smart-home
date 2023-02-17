@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\EquipmentType;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class EquipmentPaginateResource extends ResourceCollection
+class EquipmentTypePaginateResource extends JsonResource
 {
     public static $wrap = 'message';
 
@@ -22,5 +22,6 @@ class EquipmentPaginateResource extends ResourceCollection
                 'totalPages' => $this->resource->lastPage()
             ],
         ];
+
     }
 }

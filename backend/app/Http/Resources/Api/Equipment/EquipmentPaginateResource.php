@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\Equipment;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class EquipmentResource extends ResourceCollection
+class EquipmentPaginateResource extends ResourceCollection
 {
     public static $wrap = 'message';
 
@@ -16,6 +16,11 @@ class EquipmentResource extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->collection;
+        return [
+            'data' => $this->collection,
+            'meta' => [
+                'totalPages' => $this->resource->lastPage()
+            ],
+        ];
     }
 }

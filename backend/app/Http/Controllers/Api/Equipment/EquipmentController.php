@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\Equipment;
 
 use App\Http\Requests\Api\Equipment\CreateRequest;
 use App\Http\Requests\Api\Equipment\EditRequest;
-use App\Http\Resources\EquipmentPaginateResource;
-use App\Http\Resources\EquipmentResource;
-use App\Http\Resources\EquipmentShowResource;
+use App\Http\Resources\Api\Equipment\EquipmentPaginateResource;
+use App\Http\Resources\Api\Equipment\EquipmentResource;
+use App\Http\Resources\Api\Equipment\EquipmentShowResource;
 use App\Models\Equipment;
 use App\Services\EquipmentService;
 use Illuminate\Http\JsonResponse;
@@ -71,7 +71,8 @@ final class EquipmentController
         if (is_array($result)) {
             return new JsonResponse([
                 'code' => 422,
-                'message' => 'Оборудования ' . $result['serial_number'] . ' не проходит валидацию, пожалуйста, проверьте правильность серийного номера'
+                'message' =>  'Оборудования не проходит валидацию, пожалуйста, проверьте правильность серийного номера',
+                'errors' => $result,
             ], 422);
         }
 

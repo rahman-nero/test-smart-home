@@ -12,11 +12,15 @@
       <!-- Message after successfully sent -->
       <Success v-bind:show="success">Вы успешно добавили оборудование. Переадресацие через 3 секунды</Success>
 
-      <form @submit.prevent v-for="index in form_count" key="index">
+      <form @submit.prevent v-for="item in data" key="index">
+
+        <div class="remove-button"><span @click="() => removeForm(item.id)">X</span></div>
+
+
         <label class="form-label">Модель</label>
 
         <select class="form-select mb-3" aria-label=".form-select-lg"
-                @change="(e) => setSelect(index - 1, e.target.value)">
+                @change="(e) => setSelect(item.id, e.target.value)">
           <option
               v-for="option in options"
               :key="option.id"
@@ -30,7 +34,7 @@
           <label for="serial_number" class="form-label">Серийный номер</label>
           <input
               type="text"
-              @input="(e) => setSerialNumber(index-1, e.target.value)"
+              @input="(e) => setSerialNumber(item.id, e.target.value)"
               class="form-control"
               id="serial_number"
           >
@@ -40,7 +44,7 @@
           <label for="comment" class="form-label">Примечание</label>
           <textarea
               type="text"
-              @input="(e) => setComment(index-1, e.target.value)"
+              @input="(e) => setComment(item.id, e.target.value)"
               class="form-control"
               id="comment"
           ></textarea>
@@ -50,7 +54,8 @@
       </form>
 
 
-      <button type="submit" class="btn btn-secondary" @click="generationForm" style="margin-right: 10px">Добавить еще</button>
+      <button type="submit" class="btn btn-secondary" @click="generationForm" style="margin-right: 10px">Добавить еще
+      </button>
       <button type="submit" class="btn btn-primary" @click="send">Отправить</button>
     </div>
   </div>
@@ -69,9 +74,8 @@ export default {
   data() {
     return {
       options: [],
-      form_count: 1,
       data: [
-        {equipment_type_id: 1, serial_number: '', comment: ''},
+        {id: 1, equipment_type_id: 1, serial_number: '', comment: ''},
       ],
       error: false,
       errorMessage: '',
@@ -82,8 +86,21 @@ export default {
   methods: {
     // Здесь можно также реализовать чтобы можно было форму удалять, а потом очищать объект из data, но я это опустил
     generationForm() {
-      this.form_count += 1;
-      this.data = [...this.data, {equipment_type_id: 1, serial_number: '', comment: ''}];
+      const lastElement = this.data[this.data.length - 1] ?? 1;
+      this.data.push({
+        id: lastElement.id + 1,
+        equipment_type_id: 1,
+        serial_number: '',
+        comment: ''
+      });
+    },
+
+    removeForm(id) {
+      // Чтобы первую форму не удалили
+      if (id === 1) {
+        return;
+      }
+      this.data = this.data.filter((value, index) => value.id !== id);
     },
 
     async send() {
@@ -98,7 +115,13 @@ export default {
 
       } catch (error) {
         this.error = true;
-        this.errorMessage = error.response.data.message;
+
+        if (error.response.data.errors.length > 0) {
+          this.errorMessage = `${error.response.data.message}, список: ${error.response.data.errors.join(',')}`;
+        } else {
+          this.errorMessage = `${error.response.data.message}`;
+        }
+
       }
     },
     async fetchOptions() {
@@ -110,14 +133,26 @@ export default {
       }
     },
 
-    setComment(index, value) {
-      this.data[index].comment = value;
+    setComment(id, value) {
+      this.data.forEach((element, index) => {
+        if (element.id === id) {
+          this.data[index].comment = value;
+        }
+      });
     },
-    setSelect(index, value) {
-      this.data[index].equipment_type_id = +value;
+    setSelect(id, value) {
+      this.data.forEach((element, index) => {
+        if (element.id === id) {
+          this.data[index].equipment_type_id = +value;
+        }
+      });
     },
-    setSerialNumber(index, value) {
-      this.data[index].serial_number = value;
+    setSerialNumber(id, value) {
+      this.data.forEach((element, index) => {
+        if (element.id === id) {
+          this.data[index].serial_number = value;
+        }
+      });
     },
 
   },
@@ -133,4 +168,22 @@ export default {
 .form-container {
   margin-bottom: 50px;
 }
+
+.remove-button {
+  margin: 20px 0;
+  text-align: right;
+  color: white;
+}
+
+.remove-button span {
+  padding: 5px 7px;
+  background: #117eeb;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.remove-button span:hover {
+  box-shadow: 0px 0px 5px rgba(0,0,0, .2);
+}
+
 </style>

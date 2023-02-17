@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Api\Equipment;
 
-use App\Http\Resources\EquipmentPaginateResource;
-use App\Http\Resources\EquipmentTypePaginateResource;
-use App\Http\Resources\EquipmentTypeResource;
+use App\Http\Resources\Api\Equipment\EquipmentPaginateResource;
+use App\Http\Resources\Api\EquipmentType\EquipmentTypeResource;
 use App\Models\EquipmentType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
